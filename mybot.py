@@ -1,4 +1,4 @@
-import random
+import math
 
 def new_game():
   return
@@ -10,7 +10,7 @@ def make_move():
   if (board[get_my_x()][get_my_y()] > 0):
     return TAKE
 
-  rand = random.random() * 4
+  rand = math.random() * 4
 
   if (rand < 1):
     return NORTH
