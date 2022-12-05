@@ -120,7 +120,17 @@ var ExpectimaxBot = {
     var p1score = 0;
     var p2score = 0;
 
-    
+    // Score has two components:
+    // Item Type score
+    // Individual items scores
+
+    // Highest value fruit: secures a win for an item type
+    // Lowest value fruit: fruit that for an item type that is already decided
+
+    // Need "decided" calculation
+    // Metric for 'how far from decided' - if very close to decided, then each item has a high value
+    // Metric for 'deciding in my favor' - if helps to decide in your favor ()
+    // Each item value is 'deciding in my favor' / 'how far from decided' - if very close to deciding in my favor, then each item has a high value
 
     for (var row = 0; row < this.row; row++) {
       for (var col = 0; col < this.col; col++) {
