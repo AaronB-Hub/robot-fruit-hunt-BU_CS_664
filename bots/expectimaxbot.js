@@ -10,448 +10,189 @@ function new_game() {
 }
 
 function make_move() {
-  return ExpectimaxBot.makeMove();
-}
-
-
-function node(x, y, move) {
-  this.x = x;
-  this.y = y;
-  this.move = move;
+  return ExpectimaxBot.getMove()["move"];
 }
 
 var ExpectimaxBot = {
-  makeMove: function() {
-    // to disable this bot, uncomment the next line
-    // return PASS;
 
-    this.board = get_board();
+  generateMoves: function(pos) {
+    let x = pos[0];
+    let y = pos[1];
 
-    // we found an item! take it!
-    if (has_item(this.board[get_my_x()][get_my_y()])) {
-      return TAKE;
+    var nextMoves = [];  // [EAST, WEST, NORTH, SOUTH, TAKE, PASS]
+
+    if (x != WIDTH) {
+      nextMoves.push(EAST);
     }
-
-    // looks like we'll have to keep track of what moves we've looked at
-    this.toConsider = new Array();
-    this.considered = new Array(HEIGHT);
-    for (var i = 0; i < WIDTH; i++) {
-      this.considered[i] = new Array(HEIGHT);
-      for (var j = 0; j < HEIGHT; j++) {
-        this.considered[i][j] = 0;
-      }
+    if (x != 0) {
+      nextMoves.push(WEST);
     }
-
-    // let's find the move that will start leading us to the closest item
-    return this.findMove(new node(get_my_x(), get_my_y(), -1));
-  },
-
-  findMove: function(n) {
-    // closest item! we will go to it
-    if (has_item(this.board[n.x][n.y]))
-      return n.move;
-
-    var possibleMove = n.move;
-
-    // NORTH
-    if (this.considerMove(n.x, n.y-1)) {
-      if (n.move == -1) {
-        possibleMove = NORTH;
-      } 
-      this.toConsider.push(new node(n.x, n.y-1, possibleMove));
-    } 
-
-    // SOUTH
-    if (this.considerMove(n.x, n.y+1)) {
-      if (n.move == -1) {
-        possibleMove = SOUTH;
-      } 
-      this.toConsider.push(new node(n.x, n.y+1, possibleMove));
-    } 
-
-    // WEST
-    if (this.considerMove(n.x-1, n.y)) {
-      if (n.move == -1) {
-        possibleMove = WEST;
-      } 
-      this.toConsider.push(new node(n.x-1, n.y, possibleMove));
-    } 
-
-    // EAST 
-    if (this.considerMove(n.x+1, n.y)) {
-      if (n.move == -1) {
-        possibleMove = EAST;
-      } 
-      this.toConsider.push(new node(n.x+1, n.y, possibleMove));
-    } 
-
-    // take next node to bloom out from
-    if (this.toConsider.length > 0) {
-      var next = this.toConsider.shift();
-      return this.findMove(next);
+    if (y != HEIGHT) {
+      nextMoves.push(NORTH);
     }
-
-    // no move found
-    return -1;
-  },
-
-  considerMove: function(x, y) {
-    if (!this.isValidMove(x, y)) return false;
-    if (this.considered[x][y] > 0) return false;
-    this.considered[x][y] = 1;
-    return true;
-  },
-
-  isValidMove: function(x, y) {
-    if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT)
-      return false;
-    return true;
-  },
-
-  start: function(board, gamma) {
-    this.board = board;  // 2d array of Tiles
-    this.row = WIDTH;
-    this.col = HEIGHT;
-    this.nodeExpanded = 0;
-    this.gamma = gamma;
-  },
-
-  getScore: function() {
-    var p1score = 0;
-    var p2score = 0;
-
-    // Score has two components:
-    // Item Type score
-    // Individual items scores
-
-    // Highest value fruit: secures a win for an item type
-    // Lowest value fruit: fruit that for an item type that is already decided
-
-    // Need "decided" calculation
-    // Metric for 'how far from decided' - if very close to decided, then each item has a high value
-    // Metric for 'deciding in my favor' - if helps to decide in your favor ()
-    // Each item value is 'deciding in my favor' / 'how far from decided' - if very close to deciding in my favor, then each item has a high value
-
-    for (var row = 0; row < this.row; row++) {
-      for (var col = 0; col < this.col; col++) {
-        if (this.board[row][col].belongsTo === 0) {
-          p1score += parseInt(this.board[row][col].value);
-        } else if (this.board[row][col].belongsTo === 1) {
-          p2score += parseInt(this.board[row][col].value);
-        }
-      }
+    if (y != 0) {
+      nextMoves.push(SOUTH);
     }
+    nextMoves.push(TAKE);
+    nextMoves.push(PASS);
 
-    // want to maximize own score and minimize opponent's score
-    return p1score + (-p2score);
-  },
-
-  tileRemain: function() {
-    var remain = 0;
-    for (var row = 0; row < this.row; row++) {
-      for (var col = 0; col < this.col; col++) {
-        if (this.board[row][col].belongsTo === null) {
-          remain += 1;
-        }
-      }
-    }
-    return remain;
-  },
-
-  capturable: function(id, player) {
-    id = parseInt(id);
-    var opponent = player === 0 ? 1 : 0;
-    var capturables = [];
-    var row, col;
-    row = Math.floor(id / this.row);
-    col = id - row * this.row;
-
-    if (this.board[row][col === 0 ? 0 : col - 1].belongsTo === opponent) {
-      capturables.push((row * this.col + (col === 0 ? 0 : col - 1)));
-    }
-    if (this.board[row][col === this.col - 1 ? this.col - 1 : col + 1].belongsTo === opponent) {
-      capturables.push((row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1)));
-    }
-    if (this.board[row === 0 ? 0 : row - 1][col].belongsTo === opponent) {
-      capturables.push(((row === 0 ? 0 : row - 1) * this.col + col));
-    }
-    if (this.board[row === this.row - 1 ? this.row - 1 : row + 1][col].belongsTo === opponent) {
-      capturables.push(((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col));
-    }
-    return capturables;
-  },
-
-  getCommandoParaDropMoves: function(player) {
-    var moves = {};
-    // check player
-    for (var row = 0; row < this.row; row++) {
-      for (var col = 0; col < this.col; col++) {
-        if (this.board[row][col].belongsTo === null) {
-          if ((this.board[row][col === 0 ? 0 : col - 1].belongsTo !== player) &&
-            (this.board[row][col === this.col - 1 ? this.col - 1 : col + 1].belongsTo !== player) &&
-            (this.board[row === 0 ? 0 : row - 1][col].belongsTo !== player) &&
-            (this.board[row === this.row - 1 ? this.row - 1 : row + 1][col].belongsTo !== player)) {
-            moves[row * this.col + col] = "CPD";
-          }
-        }
-      }
-    }
-
-    // best moves place first
-    // possibly do {id: score if move made}
-    return moves;
-  },
-
-  getM1DeathBlitzMoves: function(player) {
-    var moves = {};
-
-    for (var row = 0; row < this.row; row++) {
-      for (var col = 0; col < this.col; col++) {
-        if (this.board[row][col].belongsTo === player) {
-          if (this.board[row][col === 0 ? 0 : col - 1].belongsTo === null) {
-            if (!moves.hasOwnProperty((row * this.col + (col === 0 ? 0 : col - 1)))) {
-              moves[(row * this.col + (col === 0 ? 0 : col - 1))] = "M1DB";
-            }
-          }
-          if (this.board[row][col === this.col - 1 ? this.col - 1 : col + 1].belongsTo === null) {
-            if (!moves.hasOwnProperty((row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1)))) {
-              moves[(row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1))] = "M1DB";
-            }
-          }
-          if (this.board[row === 0 ? 0 : row - 1][col].belongsTo === null) {
-            if (!moves.hasOwnProperty(((row === 0 ? 0 : row - 1) * this.col + col))) {
-              moves[((row === 0 ? 0 : row - 1) * this.col + col)] = "M1DB";
-            }
-          }
-          if (this.board[row === this.row - 1 ? this.row - 1 : row + 1][col].belongsTo === null) {
-            if (!moves.hasOwnProperty(((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col))) {
-              moves[((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col)] = "M1DB";
-            }
-          }
-        }
-      }
-    }
-    // possibly do {id: score if move made}
-    return moves;
-  },
-
-  getSabotageMoves: function(player) {
-    var M1DB = this.getM1DeathBlitzMoves(player);
-    var opponent = player === 0 ? 1 : 0;
-    var moves = {};
-
-    for (var row = 0; row < this.row; row++) {
-      for (var col = 0; col < this.col; col++) {
-        if (this.board[row][col].belongsTo === opponent) {
-          // M1DB is a sure capture, it has higher priority
-          if (this.board[row][col === 0 ? 0 : col - 1].belongsTo === null) {
-            if (!M1DB.hasOwnProperty((row * this.col + (col === 0 ? 0 : col - 1))) &&
-              !moves.hasOwnProperty((row * this.col + (col === 0 ? 0 : col - 1)))) {
-              moves[(row * this.col + (col === 0 ? 0 : col - 1))] = "SAB";
-            }
-          }
-          if (this.board[row][col === this.col - 1 ? this.col - 1 : col + 1].belongsTo === null) {
-            if (!M1DB.hasOwnProperty((row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1))) &&
-              !moves.hasOwnProperty((row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1)))) {
-              moves[(row * this.col + (col === this.col - 1 ? this.col - 1 : col + 1))] = "SAB";
-            }
-          }
-          if (this.board[row === 0 ? 0 : row - 1][col].belongsTo === null) {
-            if (!M1DB.hasOwnProperty(((row === 0 ? 0 : row - 1) * this.col + col)) &&
-              !moves.hasOwnProperty(((row === 0 ? 0 : row - 1) * this.col + col))) {
-              moves[((row === 0 ? 0 : row - 1) * this.col + col)] = "SAB";
-            }
-          }
-          if (this.board[row === this.row - 1 ? this.row - 1 : row + 1][col].belongsTo === null) {
-            if (!M1DB.hasOwnProperty(((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col)) &&
-              !moves.hasOwnProperty(((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col))) {
-              moves[((row === this.row - 1 ? this.row - 1 : row + 1) * this.col + col)] = "SAB";
-            }
-          }
-        }
-      }
-    }
-
-    return moves;
-  },
-
-  generateMoves: function(player) {
-    var nextMoves = {};
-    var key;
-
-    if (this.tileRemain() === 0) {
-      return nextMoves;
-    }
-
-    // get nextMoves, ordered by preference
-    var M1DB = this.getM1DeathBlitzMoves(player);
-    var SAB = this.getSabotageMoves(player);
-    var CPD = this.getCommandoParaDropMoves(player);
-
-    if (Object.keys(M1DB).length !== 0) {
-      for (key in M1DB) {
-        nextMoves[key] = M1DB[key];
-      }
-    }
-    if (Object.keys(SAB).length !== 0) {
-      for (key in SAB) {
-        if (!nextMoves.hasOwnProperty(key)) {
-          nextMoves[key] = SAB[key];
-        }
-      }
-    }
-    if (Object.keys(CPD).length !== 0) {
-      for (key in CPD) {
-        if (nextMoves.hasOwnProperty(key) && SAB.hasOwnProperty(key)) {
-          nextMoves[key] = [SAB[key], CPD[key]];
-        } else {
-          nextMoves[key] = ["PLCHOLDER", CPD[key]];
-        }
-      }
-    }
     return nextMoves;
   },
 
-  getMove: function(player) {
-    return this.expectiminimax(max_depth, player);
+  getMove: function() {
+    var pl_x = get_my_x();
+    var pl_y = get_my_y();
+    var op_x = get_opponent_x();
+    var op_y = get_opponent_y();
+    var pl = [pl_x, pl_y]
+    var op = [op_x, op_y]
+    var pos = [pl, op]
+    var items = [Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]
+    var board = JSON.parse(JSON.stringify(get_board()));  // Create a copy so that it can be modified
+    
+    this.nodeExpanded = 0;
+    return this.expectiminimax(max_depth, 0, pos, items, board);
   },
 
-  expectiminimax: function(depth, player) {
+  expectiminimax: function(depth, player, pos, items, board) {
     // Players: 0 = me, 1 = them
 
-    //console.log('In minimax, depth: ' + depth + ' for player ' + player);
+    //console.log('In expectimax, depth: ' + depth + ' for player ' + player);
     // generate moves
     this.nodeExpanded += 1;
-    var nextMoves = this.generateMoves(player);
+    var nextMoves = this.generateMoves(pos[player]);
     var bestScore = (player === 0) ? MINSCORE : MAXSCORE;
     var opponent = player === 0 ? 1 : 0;
     var currentScore;
     var bestMove = -1;
     var cap = [];
-    var moveType;
+    
 
-    if (Object.keys(nextMoves).length === 0 || depth === 0) {
-      bestScore = this.getScore();
+    if (depth == 0) {
+      bestScore = this.getScore(items);
     } else {
-      var row, col, tID, id, r, c;
 
-      for (tID in nextMoves) {
-        var capturables = [];
-        row = Math.floor(tID / this.row);
-        col = tID - row * this.row;
-
-        if (Array.isArray(nextMoves[tID]) && nextMoves[tID][0] === "SAB") { // check sabotage
-          // success
-          this.board[row][col].belongsTo = player;
-          capturables = this.capturable(tID, player);
-
-          // capture if M1DB move
-          if (capturables.length > 0) {
-            for (id = 0; id < capturables.length; id++) {
-              r = Math.floor(capturables[id] / this.row);
-              c = capturables[id] - r * this.row;
-              this.board[r][c].belongsTo = player;
-            }
-          }
-
-          currentScore = this.gamma * parseInt(this.expectiminimax(depth - 1, opponent)["score"]);
-
-          if (capturables.length > 0) {
-            for (id = 0; id < capturables.length; id++) {
-              r = Math.floor(capturables[id] / this.row);
-              c = capturables[id] - r * this.row;
-              this.board[r][c].belongsTo = (player + 1) % 2;
-            }
-          }
-          capturables = []; // reset capturables so it doesn't interfere with M1DB undo moves
-          this.board[row][col].belongsTo = null;
-
-          // failure
-          this.board[row][col].belongsTo = opponent;
-
-          currentScore = (1.0 - this.gamma) * parseInt(this.expectiminimax(depth - 1, opponent)["score"]);
-
-          this.board[row][col].belongsTo = null;
-
+      for (move in nextMoves) {
+        if (move == NORTH) {
+          pos[player][1] ++;
+        } else if (move == SOUTH) {
+          pos[player][1] --;
+        } else if (move == EAST) {
+          pos[player][0] ++;
+        } else if (move == WEST) {
+          pos[player][0] --;
+        } else if ((move == TAKE) && (board[pos[player][0]][pos[player][1]] != 0)) {
+          // Account for both bots trying to take the same fruit on the same turn
           if (player === 0) {
-            // player 0 is maximizing
-            if (currentScore > bestScore) {
-              bestScore = currentScore;
-              bestMove = parseInt(tID);
-              moveType = nextMoves[tID][0];
-              cap = capturables;
-            }
+            items[1][board[pos[player][0]][pos[player][1]]-1]++;
+            board[pos[player][0]][pos[player][1]] = board[pos[player][0]][pos[player][1]] * -1;  // Mark that the player took this fruit
           } else {
-            // player 1 is minimizing
-            if (currentScore < bestScore) {
-              bestScore = currentScore;
-              bestMove = parseInt(tID);
-              moveType = nextMoves[tID][0];
-              cap = capturables;
+            if (board[pos[player][0]][pos[player][1]] < 0) {
+              items[2][(-1 * board[pos[player][0]][pos[player][1]])-1] = items[2][(-1 * board[pos[player][0]][pos[player][1]])-1] + 0.5;
+              items[1][(-1 * board[pos[player][0]][pos[player][1]])-1] = items[1][(-1 * board[pos[player][0]][pos[player][1]])-1] - 0.5;  // Adjust the player's score since the opponent bot also picked this up
+              board[pos[player][0]][pos[player][1]] = 0;
+            } else {
+              items[2][board[pos[player][0]][pos[player][1]]-1]++;
+              board[pos[player][0]][pos[player][1]] = 0;
             }
           }
-        } // end of sabotage check
-
-        // check M1DB and CPD moves as usual
-        this.board[row][col].belongsTo = player;
-        if (nextMoves[tID] === "M1DB") {
-          capturables = this.capturable(tID, player);
-          // capture if M1DB move
-          if (capturables.length > 0) {
-            for (id = 0; id < capturables.length; id++) {
-              r = Math.floor(capturables[id] / this.row);
-              c = capturables[id] - r * this.row;
-              this.board[r][c].belongsTo = player;
+        }
+        // Clear all negative values from board after a round completes
+        if (player === 1) {
+          for (var i=0; i<WIDTH; i++) {
+            for (var j=0; j<HEIGHT; j++) {
+              if (board[i][j] < 0) {
+                board[i][j] = 0;
+              }
             }
           }
         }
 
-        currentScore = parseInt(this.expectiminimax(depth - 1, opponent)["score"]);
 
-        // undo moves: including capture moves
-        if (capturables.length > 0) {
-          for (id = 0; id < capturables.length; id++) {
-            r = Math.floor(capturables[id] / this.row);
-            c = capturables[id] - r * this.row;
-            this.board[r][c].belongsTo = (player + 1) % 2;
-          }
-        }
-        this.board[row][col].belongsTo = null;
+        currentScore = parseInt(this.expectiminimax(depth - 1, opponent, pos, items, board)["score"]);
 
         if (player === 0) {
           // player 0 is maximizing
           if (currentScore > bestScore) {
             bestScore = currentScore;
-            bestMove = parseInt(tID);
-            if (nextMoves[tID] === "M1DB") {
-              moveType = nextMoves[tID];
-            } else {
-              moveType = nextMoves[tID][1];
-            }
-            cap = capturables;
+            bestMove = move;
           }
         } else {
           // player 1 is minimizing
           if (currentScore < bestScore) {
             bestScore = currentScore;
-            bestMove = parseInt(tID);
-            if (nextMoves[tID] === "M1DB") {
-              moveType = nextMoves[tID];
-            } else {
-              moveType = nextMoves[tID][1];
-            }
-            cap = capturables;
+            bestMove = move;
           }
         }
       }
     }
 
     return {
-      "tile": bestMove,
+      "move": bestMove,
       "score": bestScore,
-      "type": moveType,
-      "capture": cap
     };
+  },
+
+  getScore: function(items) {
+
+    /* Score Calculation Notes - DIDN'T USE!!!
+    Score has two components:
+    Item Type score
+    Individual items scores
+
+    Highest value fruit: secures a win for an item type
+    Lowest value fruit: fruit that for an item type that is already decided
+
+    Need "decided" calculation
+    Metric for 'how far from decided' - if very close to decided, then each item has a high value
+    Metric for 'deciding in my favor' - if helps to decide in your favor ()
+    Each item value is 'deciding in my favor' / 'how far from decided' - if very close to deciding in my favor, then each item has a high value
+    */
+
+    // var items = [Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]
+
+    var item_type_score_max = 0;  // Player's maximum score for item type wins (Possible range: -3 to +3, although game will end at -2/+2)
+    var item_type_score_min = 0;  // Player's minimum score for item type wins
+    var item_type_score_winning = 0;  // Sum of Player's score within undecided item types
+    var item_types_left = Board.numberOfItemTypes;
+    for (var i=0; i < Board.numberOfItemTypes; i++) {
+      var diff = items[1][i] - items[2][i];
+      var numleft = items[0][i] - items[1][i] - items[2][i];
+      var item_score_max = diff + numleft;  // Player's maximum score for this item type (if <0, then can't win this item type)
+      var item_score_min = diff - numleft;  // Player's miniumum score for this item type (if >0, then always wins this item type)
+      if (item_score_min == 0 && item_score_max == 0) {  // tie
+        item_types_left --;
+      } else if (item_score_min >= 0) {
+        item_type_score_max ++;  // player 1 could win or tie
+        if (item_score_min > 0) {
+          item_type_score_min ++;  // player 1 wins for this type of fruit
+          item_types_left --;
+        } else {
+          item_type_score_winning += diff / items[0][i];  // Player's current score for this item type
+        }
+      } else if (item_score_max <= 0) {
+        item_type_score_min --;  // player 2 could win or tie
+        if (item_score_max < 0) {
+          item_type_score_max --;  // player 2 wins
+          item_types_left --;
+        } else {
+          item_type_score_winning += diff / items[0][i];  // Player's current score for this item type
+        }
+      } else if(numleft != 0) {  // still up in the air
+        item_type_score_min --;
+        item_type_score_max ++;
+        item_type_score_winning += diff / items[0][i];  // Player's current score for this item type
+      }
+    }
+
+    // item_type_score_max + opp_item_type_score_min = 0
+    // item_type_score_min + opp_item_type_score_max = 0
+    var opp_item_type_score_max = -1 * item_type_score_min;  // Opponent's maximum score for item type wins (Possible range: -3 to +3, although game will end at -2/+2)
+    var opp_item_type_score_min = -1 * item_type_score_max;  // Opponent's minimum score for item type wins
+
+    // want to maximize own score and minimize opponent's score
+    //return p0score + (-p1score);
+    return item_type_score_max + item_type_score_min + item_type_score_winning;
   },
 }
 
