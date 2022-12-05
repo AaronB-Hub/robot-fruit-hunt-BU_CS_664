@@ -1,12 +1,18 @@
 // AI bot using the Expectimax algorithm to compete
 
 // Variables for tweaking the algorithm
-var gamma = 0.2;
-var max_depth = Math.sqrt((WIDTH ** 2) + (HEIGHT ** 2));
-var MAXSCORE = 1000000000;
-var MINSCORE = -MAXSCORE;
+var max_depth;
+var MAXSCORE;
+var MINSCORE;
 
 function new_game() {
+  // Variables for tweaking the algorithm
+  max_depth = Math.floor(1.5 * Math.sqrt((WIDTH ** 2) + (HEIGHT ** 2)));
+  MAXSCORE = 1000000000;
+  MINSCORE = -MAXSCORE;
+  SimpleBot.board = get_board();
+  console.log(WIDTH, HEIGHT);
+  console.log(max_depth);
 }
 
 function make_move() {
