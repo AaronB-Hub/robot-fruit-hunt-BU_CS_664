@@ -57,7 +57,7 @@ var ExpectimaxBot = {
   expectiminimax: function(depth, player, pos, items, board) {
     // Players: 0 = me, 1 = them
 
-    //console.log('In expectimax, depth: ' + depth + ' for player ' + player);
+    console.log('In expectimax, depth: ' + depth + ' for player ' + player);
     // generate moves
     this.nodeExpanded += 1;
     var nextMoves = this.generateMoves(pos[player]);
@@ -192,7 +192,10 @@ var ExpectimaxBot = {
 
     // want to maximize own score and minimize opponent's score
     //return p0score + (-p1score);
-    return item_type_score_max + item_type_score_min + item_type_score_winning;
+    var score = item_type_score_max + item_type_score_min + item_type_score_winning;
+    console.log('Calculated score of: ' + score);
+    return score;
+
   },
 }
 
