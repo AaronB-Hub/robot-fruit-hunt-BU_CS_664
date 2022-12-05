@@ -2,7 +2,7 @@
 
 // Variables for tweaking the algorithm
 var gamma = 0.2;
-var max_depth = 3;
+var max_depth = Math.sqrt((WIDTH ** 2) + (HEIGHT ** 2));
 var MAXSCORE = 1000000000;
 var MINSCORE = -MAXSCORE;
 
@@ -47,7 +47,8 @@ var ExpectimaxBot = {
     var pl = [pl_x, pl_y]
     var op = [op_x, op_y]
     var pos = [pl, op]
-    var items = [Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]
+    //var items = [Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]
+    var items = JSON.parse(JSON.stringify([Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]));  // Create a copy so that it can be modified
     var board = JSON.parse(JSON.stringify(get_board()));  // Create a copy so that it can be modified
     
     this.nodeExpanded = 0;
@@ -57,7 +58,7 @@ var ExpectimaxBot = {
   expectiminimax: function(depth, player, pos, items, board) {
     // Players: 0 = me, 1 = them
 
-    console.log('In expectimax, depth: ' + depth + ' for player ' + player);
+    //console.log('In expectimax, depth: ' + depth + ' for player ' + player);
     // generate moves
     this.nodeExpanded += 1;
     var nextMoves = this.generateMoves(pos[player]);
@@ -65,14 +66,15 @@ var ExpectimaxBot = {
     var opponent = player === 0 ? 1 : 0;
     var currentScore;
     var bestMove = -1;
-    var cap = [];
     
 
     if (depth == 0) {
-      bestScore = this.getScore(items);
+      bestScore = this.getScore(player, items);
+      //console.log("Calculated best score for this branch.");
     } else {
 
       for (move in nextMoves) {
+        //console.log("Checking move: " + move + " for Player: " + player);
         if (move == NORTH) {
           pos[player][1] ++;
         } else if (move == SOUTH) {
@@ -109,7 +111,7 @@ var ExpectimaxBot = {
         }
 
 
-        currentScore = parseInt(this.expectiminimax(depth - 1, opponent, pos, items, board)["score"]);
+        currentScore = this.expectiminimax(depth - 1, opponent, pos, items, board)["score"];
 
         if (player === 0) {
           // player 0 is maximizing
@@ -133,7 +135,7 @@ var ExpectimaxBot = {
     };
   },
 
-  getScore: function(items) {
+  getScore: function(player, items) {
 
     /* Score Calculation Notes - DIDN'T USE!!!
     Score has two components:
@@ -156,7 +158,14 @@ var ExpectimaxBot = {
     var item_type_score_winning = 0;  // Sum of Player's score within undecided item types
     var item_types_left = Board.numberOfItemTypes;
     for (var i=0; i < Board.numberOfItemTypes; i++) {
-      var diff = items[1][i] - items[2][i];
+
+      // Determine who should be considered the "player" in this score calculation
+      if (player === 0) {
+        var diff = items[1][i] - items[2][i];
+      } else {
+        var diff = items[2][i] - items[1][i];
+      }
+      
       var numleft = items[0][i] - items[1][i] - items[2][i];
       var item_score_max = diff + numleft;  // Player's maximum score for this item type (if <0, then can't win this item type)
       var item_score_min = diff - numleft;  // Player's miniumum score for this item type (if >0, then always wins this item type)
@@ -193,7 +202,7 @@ var ExpectimaxBot = {
     // want to maximize own score and minimize opponent's score
     //return p0score + (-p1score);
     var score = item_type_score_max + item_type_score_min + item_type_score_winning;
-    console.log('Calculated score of: ' + score);
+    //console.log('Calculated score of: ' + score);
     return score;
 
   },
@@ -205,5 +214,5 @@ var ExpectimaxBot = {
 // bot(s) against known positions.
 //
 //function default_board_number() {
-//    return 123;
+//    return 610600;
 //}
