@@ -1,0 +1,46 @@
+{move: 1, depth: 10, score: 0}
+board.js:118 [1] elapsed time: 14.67s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 0.05714285714285716}
+board.js:118 [2] elapsed time: 14.25s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 0.05714285714285716}
+board.js:118 [3] elapsed time: 15.30s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 2.1904761904761907}
+board.js:118 [4] elapsed time: 11.22s
+expectimaxbot.js:21 {move: 2, depth: 10, score: 3.7142857142857144}
+board.js:118 [5] elapsed time: 6.69s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 3.7142857142857144}
+board.js:118 [6] elapsed time: 6.54s
+expectimaxbot.js:21 {move: 4, depth: 10, score: 3.7714285714285714}
+board.js:118 [7] elapsed time: 3.92s
+expectimaxbot.js:21 {move: 4, depth: 10, score: 2.3333333333333335}
+board.js:118 [8] elapsed time: 3.91s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 4}
+board.js:118 [9] elapsed time: 5.62s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [10] elapsed time: 7.36s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 4}
+board.js:118 [11] elapsed time: 7.29s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [12] elapsed time: 6.47s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 4}
+board.js:118 [13] elapsed time: 7.11s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [14] elapsed time: 3.53s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 4}
+board.js:118 [15] elapsed time: 3.88s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [16] elapsed time: 5.80s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 4}
+board.js:118 [17] elapsed time: 9.82s
+expectimaxbot.js:21 {move: 4, depth: 10, score: 4}
+board.js:118 [18] elapsed time: 8.81s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 4}
+board.js:118 [19] elapsed time: 4.14s
+expectimaxbot.js:21 {move: 1, depth: 10, score: 4}
+board.js:118 [20] elapsed time: 3.84s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [21] elapsed time: 1.89s
+expectimaxbot.js:21 {move: 3, depth: 10, score: 4}
+board.js:118 [22] elapsed time: 5.82s
+expectimaxbot.js:21 {move: 5, depth: 10, score: 4}
+board.js:118 [23] elapsed time: 7.49s
