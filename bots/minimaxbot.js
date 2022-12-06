@@ -5,7 +5,7 @@ function new_game() {
     prev_pos = [get_my_x(), get_my_y()];
 }
 
-function best_move() {
+function make_move() {
     var board = get_board();
 
     var ignore_max_fruit = get_max_fruit_count();
