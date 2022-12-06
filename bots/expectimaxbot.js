@@ -8,11 +8,12 @@ var MINSCORE;
 function new_game() {
   // Variables for tweaking the algorithm
   max_depth = Math.floor(1.5 * Math.sqrt((WIDTH ** 2) + (HEIGHT ** 2)));
+  //max_depth = 4;
   MAXSCORE = 1000000000;
   MINSCORE = -MAXSCORE;
   SimpleBot.board = get_board();
-  console.log(WIDTH, HEIGHT);
-  console.log(max_depth);
+  //console.log(WIDTH, HEIGHT);
+  //console.log(max_depth);
 }
 
 function make_move() {
@@ -27,13 +28,13 @@ var ExpectimaxBot = {
 
     var nextMoves = [];  // [EAST, WEST, NORTH, SOUTH, TAKE, PASS]
 
-    if (x != WIDTH) {
+    if (x != (WIDTH-1)) {
       nextMoves.push(EAST);
     }
     if (x != 0) {
       nextMoves.push(WEST);
     }
-    if (y != HEIGHT) {
+    if (y != (HEIGHT-1)) {
       nextMoves.push(NORTH);
     }
     if (y != 0) {
@@ -42,6 +43,7 @@ var ExpectimaxBot = {
     nextMoves.push(TAKE);
     nextMoves.push(PASS);
 
+    //console.log(nextMoves);
     return nextMoves;
   },
 
@@ -50,15 +52,23 @@ var ExpectimaxBot = {
     var pl_y = get_my_y();
     var op_x = get_opponent_x();
     var op_y = get_opponent_y();
-    var pl = [pl_x, pl_y]
-    var op = [op_x, op_y]
-    var pos = [pl, op]
+    var pl = [pl_x, pl_y];
+    var op = [op_x, op_y];
+    var pos1 = [pl, op];
+    var pos2 = JSON.parse(JSON.stringify(pos1));  // Create a copy so that it can be modified
     //var items = [Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]
     var items = JSON.parse(JSON.stringify([Board.totalItems, Board.myBotCollected, Board.simpleBotCollected]));  // Create a copy so that it can be modified
-    var board = JSON.parse(JSON.stringify(get_board()));  // Create a copy so that it can be modified
+    var board1 = get_board();
+    var board2 = JSON.parse(JSON.stringify(board1));  // Create a copy so that it can be modified
+    //console.log(typeof board2)
+    //console.log(typeof [1,5,2,5])
+    //console.log(JSON.stringify(board2))
+    // console.log(pos2[0][0], pos2[0][0]-1);
+    // console.log(board2[pl_x][pl_y-1]);
+    // console.log(board2[pos2[0][0]][pos2[0][0]-1]);
     
     this.nodeExpanded = 0;
-    return this.expectiminimax(max_depth, 0, pos, items, board);
+    return this.expectiminimax(max_depth, 0, pos2, items, board2);
   },
 
   expectiminimax: function(depth, player, pos, items, board) {
@@ -72,15 +82,25 @@ var ExpectimaxBot = {
     var opponent = player === 0 ? 1 : 0;
     var currentScore;
     var bestMove = -1;
-    
+
+    let position = JSON.parse(JSON.stringify(pos));  // Create a copy so that it can be modified
+    let items_store = JSON.parse(JSON.stringify(items));  // Create a copy so that it can be modified
+    let board_store = JSON.parse(JSON.stringify(board));  // Create a copy so that it can be modified
+
+    console.log(depth);    
 
     if (depth == 0) {
       bestScore = this.getScore(player, items);
       //console.log("Calculated best score for this branch.");
     } else {
 
-      for (move in nextMoves) {
-        //console.log("Checking move: " + move + " for Player: " + player);
+      for (dir in nextMoves) {
+        let move = nextMoves[dir];
+        pos = JSON.parse(JSON.stringify(position));
+        items = JSON.parse(JSON.stringify(items_store));
+        board = JSON.parse(JSON.stringify(board_store));
+
+        //console.log("Checking move: " + move + " at depth: " + depth + " for Player: " + player);
         if (move == NORTH) {
           pos[player][1] ++;
         } else if (move == SOUTH) {
