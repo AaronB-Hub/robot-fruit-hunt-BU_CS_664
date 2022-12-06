@@ -53,8 +53,8 @@ function make_move() {
             if (cell_my_distance(x, y) < cell_opponent_distance(x, y)) {
                 fruit += Math.min(3, (rare_fruit(board[x][y]) / 4));
 
-                if (Math.min(get_my_x(), get_opp_x()) <= x && x <= Math.max(get_my_x(), get_opp_x()) && 
-                Math.min(get_my_y(), get_opp_y()) <= y && y <= Math.max(get_my_y(), get_opp_y())) {
+                if (Math.min(get_my_x(), get_opponent_x()) <= x && x <= Math.max(get_my_x(), get_opponent_x()) && 
+                Math.min(get_my_y(), get_opponent_y()) <= y && y <= Math.max(get_my_y(), get_opponent_y())) {
                     fruit += Math.min(3, (rare_fruit(board[x][y]) / 2));
                 }
             }
@@ -114,17 +114,17 @@ function make_move() {
 
 function get_max_fruit_count() {
     //Getting the maximum fruit counts for all the types of fruits
-    if (get_item_types() <= 3) {
+    if (get_number_of_item_types() <= 3) {
         return 0;
     }
 
     var res = 1;
-    var max_fruit = get_total_count_fruits(1);
+    var max_fruit = get_total_item_count(1);
 
-    for (i = 2; i <= get_item_types(); i++) {
-        if (get_total_count_fruits(i) > max_fruit) {
+    for (i = 2; i <= get_number_of_item_types(); i++) {
+        if (get_total_item_count(i) > max_fruit) {
             res = i;
-            max_fruit = get_total_count_fruits(i);
+            max_fruit = get_total_item_count(i);
         }
     }
     return res;
@@ -135,7 +135,7 @@ function cell_my_distance(x, y) {
 }
 
 function cell_opponent_distance(x, y) {
-    return (Math.abs(y - get_opp_y()) + Math.abs(x - get_opp_x()));
+    return (Math.abs(y - get_opponent_y()) + Math.abs(x - get_opponent_x()));
 }
 
 function closest_fruit(x, y) {
@@ -144,27 +144,27 @@ function closest_fruit(x, y) {
 }
 
 function rare_fruit(fruit) {
-    var rare = Math.round(total_available_fruits() / (get_total_count_fruits(fruit) - get_my_items(fruit) - get_opponent_items(fruit)));
+    var rare = Math.round(total_available_fruits() / (get_total_item_count(fruit) - get_my_item_count(fruit) - get_opponent_item_count(fruit)));
 
     if (rare > (total_available_fruits() / 2)) {
         rare = total_available_fruits() / 2;
     }
 
-    if (get_my_items(fruit) <= get_opponent_items(fruit) && (get_my_items(fruit) + 1) > get_opponent_items(fruit)) {
+    if (get_my_item_count(fruit) <= get_opponent_item_count(fruit) && (get_my_item_count(fruit) + 1) > get_opponent_item_count(fruit)) {
         rare += 0.5;
     }
 
     //If it is the last fruit of it's type (when above)
-    if ((get_total_count_fruits(fruit) - get_my_items(fruit) - get_opponent_items(fruit) == 1) && 
-    ((get_my_items(fruit) < get_opponent_items(fruit) && (get_my_items(fruit) + 1) >= get_opponent_items(fruit)) || 
-    (get_my_items(fruit) <= get_opponent_items(fruit) && (get_my_items(fruit) + 1) > get_opponent_items(fruit)))) {
+    if ((get_total_item_count(fruit) - get_my_item_count(fruit) - get_opponent_item_count(fruit) == 1) && 
+    ((get_my_item_count(fruit) < get_opponent_item_count(fruit) && (get_my_item_count(fruit) + 1) >= get_opponent_item_count(fruit)) || 
+    (get_my_item_count(fruit) <= get_opponent_item_count(fruit) && (get_my_item_count(fruit) + 1) > get_opponent_item_count(fruit)))) {
         rare += 2
     }
     else {
         //if the count is much more than the fruit count
-        if ((get_total_count_fruits(fruit) - get_my_items(fruit) - get_opponent_items(fruit) == 1) && 
-        ((get_opponent_items(fruit) < get_my_items(fruit) && (get_opponent_items(fruit) + 1) >= get_my_items(fruit)) || 
-        (get_opponent_items(fruit) <= get_my_items(fruit) && (get_opponent_items(fruit) + 1) > get_my_items(fruit)))) {
+        if ((get_total_item_count(fruit) - get_my_item_count(fruit) - get_opponent_item_count(fruit) == 1) && 
+        ((get_opponent_item_count(fruit) < get_my_item_count(fruit) && (get_opponent_item_count(fruit) + 1) >= get_my_item_count(fruit)) || 
+        (get_opponent_item_count(fruit) <= get_my_item_count(fruit) && (get_opponent_item_count(fruit) + 1) > get_my_item_count(fruit)))) {
             rare += 2;
         }
     }
@@ -173,14 +173,14 @@ function rare_fruit(fruit) {
 
 function useless_item_currpos(type_of_fruit) {
     //If the opponent or our bot has the fruit type more than half the count
-    return (get_opponent_items(type_of_fruit) > (get_total_count_fruits(type_of_fruit) / 2) || 
-    get_my_items(type_of_fruit) > (get_total_count_fruits(type_of_fruit) / 2));
+    return (get_opponent_item_count(type_of_fruit) > (get_total_item_count(type_of_fruit) / 2) || 
+    get_my_item_count(type_of_fruit) > (get_total_item_count(type_of_fruit) / 2));
 }
 
 function total_available_fruits() {
     var total = 0;
-    for (i = 1; i <= get_item_types(); i++) {
-        total += (get_total_count_fruits(i) - get_opponent_items(i) - get_my_items(i));
+    for (i = 1; i <= get_number_of_item_types(); i++) {
+        total += (get_total_item_count(i) - get_opponent_item_count(i) - get_my_item_count(i));
     }
     return total;
 }
