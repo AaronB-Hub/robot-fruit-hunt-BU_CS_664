@@ -8,7 +8,7 @@ var MINSCORE;
 function new_game() {
   // Variables for tweaking the algorithm
   //max_depth = Math.floor(Math.sqrt((WIDTH ** 2) + (HEIGHT ** 2)));
-  max_depth = 8;  // Should be in increments of 2
+  max_depth = 10;  // Should be in increments of 2
   MAXSCORE = 1000000000;
   MINSCORE = -MAXSCORE;
   SimpleBot.board = get_board();
@@ -18,7 +18,7 @@ function new_game() {
 
 function make_move() {
   let calc_move = ExpectimaxBot.getMove()
-  //console.log(calc_move);
+  console.log(calc_move);
   return calc_move["bestMove"];
 }
 
