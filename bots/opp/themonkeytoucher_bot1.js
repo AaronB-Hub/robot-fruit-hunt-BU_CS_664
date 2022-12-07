@@ -1,3 +1,5 @@
+// From: https://github.com/themonkeytoucher/robot-fruit-hunt/blob/master/bots/andrew_daniel.js
+
 var itemStats = {};
 function new_game() {
    for(var ii = 0; ii < get_number_of_item_types(); ii++){

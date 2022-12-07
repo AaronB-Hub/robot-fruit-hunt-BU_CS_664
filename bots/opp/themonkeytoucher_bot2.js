@@ -1,3 +1,5 @@
+// From: https://github.com/themonkeytoucher/robot-fruit-hunt/blob/master/bots/dae-ho.js
+
 function new_game() {
 }
 

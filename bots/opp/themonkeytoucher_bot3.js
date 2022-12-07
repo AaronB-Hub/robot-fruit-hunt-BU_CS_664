@@ -1,3 +1,5 @@
+// From: https://github.com/themonkeytoucher/robot-fruit-hunt/blob/master/bots/scott_and_lauren.js
+
 function new_game() {
 }
 
